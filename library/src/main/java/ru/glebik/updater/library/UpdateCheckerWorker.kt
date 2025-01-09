@@ -21,6 +21,9 @@ class UpdateCheckerWorker(
             val response = HttpUtils.get(checkUrl) ?: return Result.failure()
             val checkModel = Parser.parseJson(response)
             Log.d(Consts.LIBRARY_TAG, checkModel?.toString() ?: "no response")
+
+            downloadApk(applicationContext, "https://raw.githubusercontent.com/feicien/android-auto-update/develop/extras/android-auto-update-v1.3.apk")
+
             Result.success()
         } catch (e: Exception) {
             Log.e(Consts.LIBRARY_TAG, e.toString())
