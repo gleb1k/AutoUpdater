@@ -14,7 +14,7 @@ class App : Application() {
         super.onCreate()
 
         val inputData = Data.Builder()
-            .putString(Consts.KEY_CHECK_URL, Consts.CHECK_URL)
+            .putString(Consts.KEY_CHECK_URL, Consts.CHECK_URL_EXAMPLE)
             .build()
         // Настройка и запуск Worker
         val oneTimeWorkRequest = OneTimeWorkRequest.Builder(UpdateCheckerWorker::class.java)

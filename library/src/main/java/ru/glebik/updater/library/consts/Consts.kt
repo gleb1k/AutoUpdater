@@ -9,7 +9,7 @@ object Consts {
     const val LIBRARY_TAG = "AutoUpdater"
 
     const val KEY_CHECK_URL = "CHECK_URL"
-    const val CHECK_URL =
-        "https://raw.githubusercontent.com/feicien/android-auto-update/develop/extras/update.json"
+    const val CHECK_URL_EXAMPLE =
+        "https://raw.githubusercontent.com/gleb1k/AutoUpdater/refs/heads/master/extras/update.json"
 
 }
