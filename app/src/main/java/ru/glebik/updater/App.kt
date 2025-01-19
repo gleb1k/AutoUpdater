@@ -1,11 +1,11 @@
 package ru.glebik.updater
 
 import android.app.Application
-import androidx.work.Data
-import androidx.work.OneTimeWorkRequest
-import androidx.work.WorkManager
-import ru.glebik.updater.library.UpdateCheckerWorker
-import ru.glebik.updater.library.consts.Consts
+import ru.glebik.updater.library.AutoUpdater
+import ru.glebik.updater.library.checker.CheckerParameters
+import ru.glebik.updater.library.consts.InternalConsts.CHECK_URL_EXAMPLE
+import ru.glebik.updater.library.init.UpdateConfig
+import java.util.concurrent.TimeUnit
 
 
 class App : Application() {
@@ -13,13 +13,14 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        val inputData = Data.Builder()
-            .putString(Consts.KEY_CHECK_URL, Consts.CHECK_URL_EXAMPLE)
+        val checkerParameters = CheckerParameters.default(CHECK_URL_EXAMPLE)
+
+        val updateConfig = UpdateConfig.Builder.builder()
+            .setCheckerParameters(checkerParameters)
+            .setPeriodic() // Choose periodic mode
+            .setInterval(6, TimeUnit.HOURS) // Set interval
             .build()
-        // Настройка и запуск Worker
-        val oneTimeWorkRequest = OneTimeWorkRequest.Builder(UpdateCheckerWorker::class.java)
-            .setInputData(inputData)
-            .build()
-        WorkManager.getInstance(this).enqueue(oneTimeWorkRequest)
+
+        AutoUpdater.start(this, updateConfig)
     }
 }
