@@ -13,7 +13,7 @@ data class CheckerParameters(
     val needToDownload: Boolean = false
 ) {
     companion object {
-        fun default(checkUrl: String, needToDownload: Boolean = false): CheckerParameters =
+        fun default(checkUrl: String, needToDownload: Boolean = true): CheckerParameters =
             CheckerParameters(
                 checkUrl = checkUrl,
                 keyApkUrl = DefaultConsts.KEY_APK_URL,

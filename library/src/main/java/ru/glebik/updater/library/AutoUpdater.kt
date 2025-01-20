@@ -36,10 +36,8 @@ object AutoUpdater {
             .putString(InternalConsts.INTERNAL_KEY_FOR_CHECK_URL, params.checkUrl)
             .putString(InternalConsts.INTERNAL_KEY_FOR_KEY_APK_URL, params.keyApkUrl)
             .putString(InternalConsts.INTERNAL_KEY_FOR_KEY_VERSION, params.keyVersion)
-            .putString(
-                InternalConsts.INTERNAL_KEY_FOR_KEY_UPDATE_MESSAGE,
-                params.keyUpdateMessage
-            )
+            .putString(InternalConsts.INTERNAL_KEY_FOR_KEY_UPDATE_MESSAGE, params.keyUpdateMessage)
+            .putBoolean(InternalConsts.INTERNAL_KEY_FOR_NEED_TO_DOWNLOAD, params.needToDownload)
             .build()
         return inputData
     }

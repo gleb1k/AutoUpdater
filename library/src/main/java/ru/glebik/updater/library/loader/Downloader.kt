@@ -16,7 +16,7 @@ fun downloadApk(context: Context, apkUrl: String) {
     val request = DownloadManager.Request(uri).apply {
         setTitle("Downloading APK")
         setDescription("Downloading the latest version of the app.")
-        setDestinationInExternalFilesDir(context, null, "app-update.apk")
+        setDestinationInExternalFilesDir(context, null, "app-update.apk") //todo name
         setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
     }
 
