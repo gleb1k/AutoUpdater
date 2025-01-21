@@ -15,6 +15,13 @@ object AppUtils {
         }
     }
 
+    fun getAppFileName(context: Context): String {
+        val appNameFileName = getAppName(context)
+            .replace("\\s+".toRegex(), "-") // Удаляем пробелы
+            .lowercase() // Преобразуем в строчные буквы
+        return "$appNameFileName.apk"
+    }
+
     // Получение версии приложения
     fun getAppVersion(context: Context): String {
         return try {
