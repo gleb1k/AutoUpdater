@@ -16,6 +16,16 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/udpate_apk_files" />
         </provider>
+
+        <receiver
+            android:name=".loader.InstallBroadcastReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.example.ACTION_INSTALL_COMPLETE" />
+            </intent-filter>
+        </receiver>
+
     </application>
+
 
 </manifest>
