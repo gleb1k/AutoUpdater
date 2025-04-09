@@ -15,7 +15,7 @@ object AppUtils {
         }
     }
 
-    fun getAppFileName(context: Context): String {
+    fun getAppApkFileName(context: Context): String {
         val appNameFileName = getAppName(context)
             .replace("\\s+".toRegex(), "-") // Удаляем пробелы
             .lowercase() // Преобразуем в строчные буквы

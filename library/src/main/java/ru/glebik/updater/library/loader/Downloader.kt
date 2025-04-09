@@ -9,13 +9,12 @@ import android.content.IntentFilter
 import android.content.pm.PackageInstaller
 import android.database.Cursor
 import android.net.Uri
-import android.os.Build
-import android.provider.Settings
 import android.util.Log
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import ru.glebik.updater.library.AppUtils
 import java.io.File
+import java.util.zip.ZipFile
 
 
 fun downloadApk(context: Context, apkUrl: String) {
@@ -27,7 +26,7 @@ fun downloadApk(context: Context, apkUrl: String) {
     val request = DownloadManager.Request(uri).apply {
         setTitle("Downloading APK")
         setDescription("Downloading the latest version of the app.")
-        setDestinationInExternalFilesDir(context, null, AppUtils.getAppFileName(context))
+        setDestinationInExternalFilesDir(context, null, AppUtils.getAppApkFileName(context))
         setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
     }
 
@@ -50,6 +49,7 @@ fun downloadApk(context: Context, apkUrl: String) {
                         // Установка APK
                         val apkUri = getDownloadedApkUri(context)
                         updateAppWithPackageInstaller(context, getDownloadedApkFile(context))
+                        context.unregisterReceiver(this)
                     }
                 }
                 cursor.close()
@@ -62,12 +62,12 @@ fun downloadApk(context: Context, apkUrl: String) {
 }
 
 fun getDownloadedApkUri(context: Context): Uri {
-    val apkFile = File(context.getExternalFilesDir(null), AppUtils.getAppFileName(context))
+    val apkFile = File(context.getExternalFilesDir(null), AppUtils.getAppApkFileName(context))
     return FileProvider.getUriForFile(context, "${context.packageName}.provider", apkFile)
 }
 
 fun getDownloadedApkFile(context: Context): File {
-     return File(context.getExternalFilesDir(null), AppUtils.getAppFileName(context))
+    return File(context.getExternalFilesDir(null), AppUtils.getAppApkFileName(context))
 }
 
 fun installApk(context: Context, apkUri: Uri) {
@@ -79,37 +79,58 @@ fun installApk(context: Context, apkUri: Uri) {
 }
 
 fun updateAppWithPackageInstaller(context: Context, apkFile: File) {
-    val packageInstaller = context.packageManager.packageInstaller
-    val params = PackageInstaller.SessionParams(PackageInstaller.SessionParams.MODE_FULL_INSTALL).apply {
-        setAppPackageName(context.packageName) // обязательно указываем имя текущего пакета
-    }
+    try {
+        Log.d("DEBUG", "File exists: ${apkFile.exists()}, path: ${apkFile.absolutePath}, size: ${apkFile.length()}\"")
+        val packageManager = context.packageManager
+        val packageInstaller = packageManager.packageInstaller
+        val params =
+            PackageInstaller.SessionParams(PackageInstaller.SessionParams.MODE_FULL_INSTALL).apply {
+                setAppPackageName(context.packageName) // обязательно указываем имя текущего пакета
+            }
 
-    val sessionId = packageInstaller.createSession(params)
-    val session = packageInstaller.openSession(sessionId)
+        val sessionId = packageInstaller.createSession(params)
+        val session = packageInstaller.openSession(sessionId)
 
-    // Пишем APK в сессию
-    apkFile.inputStream().use { input ->
-        session.openWrite("update", 0, -1).use { output ->
-            input.copyTo(output)
-            session.fsync(output)
+        val info = packageManager.getPackageArchiveInfo(apkFile.absolutePath, 0)
+        if (info == null) {
+            Log.e("DEBUG", "Invalid APK file: ${apkFile.absolutePath}")
+            return
         }
+
+        val zipFile = ZipFile(apkFile)
+        val entry = zipFile.getEntry("AndroidManifest.xml")
+        if (entry != null) {
+            Log.d("DEBUG", "APK is valid!")
+        } else {
+            Log.e("DEBUG", "Invalid APK format")
+        }
+
+        // Пишем APK в сессию
+        apkFile.inputStream().use { input ->
+            session.openWrite(AppUtils.getAppApkFileName(context), 0, apkFile.length()).use { output ->
+                input.copyTo(output)
+                session.fsync(output)
+            }
+        }
+
+        // PendingIntent нужен для получения обратного вызова
+        val intent = Intent(context, InstallBroadcastReceiver::class.java).apply {
+            action = "com.example.ACTION_UPDATE_RESULT"
+        }
+
+        val pendingIntent = PendingIntent.getBroadcast(
+            context,
+            sessionId,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
+        )
+
+        // Завершаем установку
+        session.commit(pendingIntent.intentSender)
+        session.close()
+    } catch (e: Exception) {
+        Log.d("Installer", "error:$e")
     }
-
-    // PendingIntent нужен для получения обратного вызова
-    val intent = Intent(context, InstallBroadcastReceiver::class.java).apply {
-        action = "com.example.ACTION_UPDATE_RESULT"
-    }
-
-    val pendingIntent = PendingIntent.getBroadcast(
-        context,
-        sessionId,
-        intent,
-        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
-    )
-
-    // Завершаем установку
-    session.commit(pendingIntent.intentSender)
-    session.close()
 }
 
 class InstallBroadcastReceiver : BroadcastReceiver() {
@@ -121,6 +142,7 @@ class InstallBroadcastReceiver : BroadcastReceiver() {
             PackageInstaller.STATUS_SUCCESS -> {
                 Log.d("Installer", "Установка прошла успешно")
             }
+
             else -> {
                 Log.e("Installer", "Ошибка установки: $message")
             }
