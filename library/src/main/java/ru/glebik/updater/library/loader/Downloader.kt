@@ -1,15 +1,18 @@
 package ru.glebik.updater.library.loader
 
 import android.app.DownloadManager
-import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageInstaller
+import android.content.pm.PackageManager
 import android.database.Cursor
 import android.net.Uri
+import android.os.Build
+import android.os.Process
 import android.util.Log
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import ru.glebik.updater.library.AppUtils
@@ -48,7 +51,11 @@ fun downloadApk(context: Context, apkUrl: String) {
                     if (status == DownloadManager.STATUS_SUCCESSFUL) {
                         // Установка APK
                         val apkUri = getDownloadedApkUri(context)
-                        updateAppWithPackageInstaller(context, getDownloadedApkFile(context))
+                        updateAppWithPackageInstaller(
+                            context,
+                            apkUri
+                        )
+                        //installApk(context, apkUri)
                         context.unregisterReceiver(this)
                     }
                 }
@@ -58,7 +65,12 @@ fun downloadApk(context: Context, apkUrl: String) {
     }
 
     // Регистрируем BroadcastReceiver
-    context.registerReceiver(receiver, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
+    ContextCompat.registerReceiver(
+        context,
+        receiver,
+        IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE),
+        ContextCompat.RECEIVER_EXPORTED
+    )
 }
 
 fun getDownloadedApkUri(context: Context): Uri {
@@ -78,18 +90,21 @@ fun installApk(context: Context, apkUri: Uri) {
     context.startActivity(intent)
 }
 
-fun updateAppWithPackageInstaller(context: Context, apkFile: File) {
+fun updateAppWithPackageInstaller(context: Context, apkFileUri: Uri) {
     try {
-        Log.d("DEBUG", "File exists: ${apkFile.exists()}, path: ${apkFile.absolutePath}, size: ${apkFile.length()}\"")
+        val apkFile = getDownloadedApkFile(context)
+        Log.d(
+            "DEBUG",
+            "File exists: ${apkFile.exists()}, path: ${apkFile.absolutePath}, size: ${apkFile.length()}\""
+        )
         val packageManager = context.packageManager
         val packageInstaller = packageManager.packageInstaller
-        val params =
-            PackageInstaller.SessionParams(PackageInstaller.SessionParams.MODE_FULL_INSTALL).apply {
-                setAppPackageName(context.packageName) // обязательно указываем имя текущего пакета
-            }
 
-        val sessionId = packageInstaller.createSession(params)
-        val session = packageInstaller.openSession(sessionId)
+        val installSessionId =
+            packageInstaller.createSession(configureInstallSessionParams(context))
+        val installSession = packageInstaller.openSession(installSessionId)
+
+        val contentResolver = context.contentResolver
 
         val info = packageManager.getPackageArchiveInfo(apkFile.absolutePath, 0)
         if (info == null) {
@@ -106,46 +121,41 @@ fun updateAppWithPackageInstaller(context: Context, apkFile: File) {
         }
 
         // Пишем APK в сессию
-        apkFile.inputStream().use { input ->
-            session.openWrite(AppUtils.getAppApkFileName(context), 0, apkFile.length()).use { output ->
-                input.copyTo(output)
-                session.fsync(output)
+        contentResolver.openInputStream(apkFileUri).use { apkStream ->
+            requireNotNull(apkStream) { "$apkFileUri openInputStream was null!" }
+            val installSessionStream =
+                installSession.openWrite("INSTALL_SESSION_FILE", 0, -1)
+            installSessionStream.buffered().use { bufferedInstallStream ->
+                apkStream.copyTo(bufferedInstallStream)
+                bufferedInstallStream.flush()
+                installSession.fsync(installSessionStream)
             }
         }
 
-        // PendingIntent нужен для получения обратного вызова
-        val intent = Intent(context, InstallBroadcastReceiver::class.java).apply {
-            action = "com.example.ACTION_UPDATE_RESULT"
-        }
-
-        val pendingIntent = PendingIntent.getBroadcast(
-            context,
-            sessionId,
-            intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
+        val resultPendingIntent = InstallResultReceiver.createPendingIntent(
+            context = context, apkFileUri = apkFileUri, installSessionId = installSessionId
         )
 
         // Завершаем установку
-        session.commit(pendingIntent.intentSender)
-        session.close()
+        installSession.commit(resultPendingIntent.intentSender)
+        installSession.close()
+        //todo Ошибка установки: INSTALL_FAILED_UPDATE_INCOMPATIBLE: Existing package ru.glebik.updater signatures do not match newer version; ignoring!
+        // проверить подписи!!!!!!!
     } catch (e: Exception) {
         Log.d("Installer", "error:$e")
     }
 }
 
-class InstallBroadcastReceiver : BroadcastReceiver() {
-    override fun onReceive(context: Context, intent: Intent) {
-        val status = intent.getIntExtra(PackageInstaller.EXTRA_STATUS, -1)
-        val message = intent.getStringExtra(PackageInstaller.EXTRA_STATUS_MESSAGE)
-
-        when (status) {
-            PackageInstaller.STATUS_SUCCESS -> {
-                Log.d("Installer", "Установка прошла успешно")
-            }
-
-            else -> {
-                Log.e("Installer", "Ошибка установки: $message")
-            }
+private fun configureInstallSessionParams(context: Context): PackageInstaller.SessionParams =
+    PackageInstaller.SessionParams(PackageInstaller.SessionParams.MODE_FULL_INSTALL).apply {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            setInstallerPackageName(context.applicationContext.packageName)
         }
+        setOriginatingUid(Process.myUid())
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            setRequireUserAction(PackageInstaller.SessionParams.USER_ACTION_NOT_REQUIRED)
+            setInstallReason(PackageManager.INSTALL_REASON_USER)
+        }
+        setAppPackageName(context.applicationContext.packageName)
     }
-}
+
