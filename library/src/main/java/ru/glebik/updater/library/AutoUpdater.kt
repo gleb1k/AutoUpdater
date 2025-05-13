@@ -13,13 +13,23 @@ import ru.glebik.updater.library.consts.InternalConsts
 import ru.glebik.updater.library.init.UpdateConfig
 import ru.glebik.updater.library.notifications.AutoUpdateNotifier
 
+@SuppressLint("StaticFieldLeak")
 object AutoUpdater {
 
-    @SuppressLint("StaticFieldLeak")
-    lateinit var notifier: AutoUpdateNotifier
+    val notifier: AutoUpdateNotifier by lazy {
+        check(::applicationContext.isInitialized) {
+            "AutoUpdater.init(context) must be called before accessing notifier"
+        }
+        AutoUpdateNotifier(context = applicationContext)
+    }
 
-    fun init(applicationContext: Context, updateConfig: UpdateConfig) {
+    lateinit var applicationContext: Context
 
+    fun init(applicationContext: Context) {
+        this.applicationContext = applicationContext
+    }
+
+    fun startInstallProcess(updateConfig: UpdateConfig) {
         val inputData = checkerParamsToWorkerData(updateConfig.checkerParameters)
 
         if (updateConfig.isPeriodic) {
@@ -34,8 +44,6 @@ object AutoUpdater {
                 inputData = inputData
             )
         }
-
-        notifier = AutoUpdateNotifier(context = applicationContext)
     }
 
     private fun checkerParamsToWorkerData(params: CheckerParameters): Data {
