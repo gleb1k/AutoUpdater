@@ -1,5 +1,6 @@
 package ru.glebik.updater.library
 
+import android.annotation.SuppressLint
 import android.content.Context
 import androidx.work.Data
 import androidx.work.ExistingWorkPolicy
@@ -10,10 +11,14 @@ import ru.glebik.updater.library.checker.CheckerParameters
 import ru.glebik.updater.library.checker.UpdateCheckerWorker
 import ru.glebik.updater.library.consts.InternalConsts
 import ru.glebik.updater.library.init.UpdateConfig
+import ru.glebik.updater.library.notifications.AutoUpdateNotifier
 
 object AutoUpdater {
 
-    fun start(applicationContext: Context, updateConfig: UpdateConfig) {
+    @SuppressLint("StaticFieldLeak")
+    lateinit var notifier: AutoUpdateNotifier
+
+    fun init(applicationContext: Context, updateConfig: UpdateConfig) {
 
         val inputData = checkerParamsToWorkerData(updateConfig.checkerParameters)
 
@@ -29,6 +34,8 @@ object AutoUpdater {
                 inputData = inputData
             )
         }
+
+        notifier = AutoUpdateNotifier(context = applicationContext)
     }
 
     private fun checkerParamsToWorkerData(params: CheckerParameters): Data {

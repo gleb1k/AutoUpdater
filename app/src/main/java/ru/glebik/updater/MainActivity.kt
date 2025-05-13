@@ -96,7 +96,7 @@ class MainActivity : ComponentActivity() {
                         Text("AppVersion: ${AppUtils.getAppVersion(context)}, AppVersionCode: ${AppUtils.getAppVersionCode(context)} " )
                         Button(
                             onClick = {
-                                AutoUpdater.start(context, updateConfig)
+                                AutoUpdater.init(context, updateConfig)
                             },
                             content = {
                                 Text("Install")
