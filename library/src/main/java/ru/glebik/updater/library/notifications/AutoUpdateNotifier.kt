@@ -4,6 +4,8 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
+import android.os.Bundle
 import androidx.core.app.NotificationCompat
 
 class AutoUpdateNotifier(private val context: Context) {
@@ -22,6 +24,10 @@ class AutoUpdateNotifier(private val context: Context) {
             NotificationManager.IMPORTANCE_DEFAULT
         ).apply {
             description = "Уведомления от системы автообновлений"
+            enableVibration(true)
+            enableLights(true)
+            setShowBadge(true)
+
         }
         notificationManager.createNotificationChannel(channel)
     }
@@ -41,12 +47,19 @@ class AutoUpdateNotifier(private val context: Context) {
     }
 
     fun showSuccessNotification() {
+        val intent = PendingIntent.getActivity(
+            context,
+            0,
+            context.packageManager.getLaunchIntentForPackage(context.packageName) ?: Intent(),
+            PendingIntent.FLAG_IMMUTABLE,
+        )
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(android.R.drawable.stat_sys_download_done)
             .setContentTitle("Обновление завершено")
             .setContentText("Приложение успешно обновлено.")
             .setAutoCancel(true)
-            .setSilent(true)
+            .setSilent(false)
+            .setContentIntent(intent)
             .build()
 
         notificationManager.notify(NOTIFICATION_ID, notification)

@@ -139,8 +139,6 @@ fun updateAppWithPackageInstaller(context: Context, apkFileUri: Uri) {
         // Завершаем установку
         installSession.commit(resultPendingIntent.intentSender)
         installSession.close()
-        //todo Ошибка установки: INSTALL_FAILED_UPDATE_INCOMPATIBLE: Existing package ru.glebik.updater signatures do not match newer version; ignoring!
-        // проверить подписи!!!!!!!
     } catch (e: Exception) {
         Log.d("Installer", "error:$e")
     }
