@@ -1,6 +1,6 @@
 package ru.glebik.updater.library.init
 
-import ru.glebik.updater.library.checker.CheckerParameters
+import ru.glebik.updater.library.main.checker.CheckerParameters
 import java.util.concurrent.TimeUnit
 
 /**

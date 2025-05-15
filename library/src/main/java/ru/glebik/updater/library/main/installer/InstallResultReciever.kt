@@ -1,4 +1,4 @@
-package ru.glebik.updater.library.loader
+package ru.glebik.updater.library.main.installer
 
 import android.app.PendingIntent
 import android.content.BroadcastReceiver

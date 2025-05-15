@@ -23,7 +23,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import ru.glebik.updater.library.AppUtils
 import ru.glebik.updater.library.AutoUpdater
-import ru.glebik.updater.library.checker.CheckerParameters
+import ru.glebik.updater.library.main.checker.CheckerParameters
 import ru.glebik.updater.library.consts.InternalConsts.CHECK_URL_EXAMPLE
 import ru.glebik.updater.library.init.UpdateConfig
 import ru.glebik.updater.ui.theme.AutoUpdaterTheme

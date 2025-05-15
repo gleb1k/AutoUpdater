@@ -22,7 +22,7 @@
         </provider>
 
         <receiver
-            android:name=".loader.InstallResultReceiver"
+            android:name=".main.installer.InstallResultReceiver"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.example.ACTION_INSTALL_COMPLETE" />

@@ -1,4 +1,4 @@
-package ru.glebik.updater.library.checker
+package ru.glebik.updater.library.main.checker
 
 import ru.glebik.updater.library.consts.DefaultConsts
 

@@ -1,4 +1,4 @@
-package ru.glebik.updater.library.checker
+package ru.glebik.updater.library.main.checker
 
 import android.content.Context
 import android.util.Log
@@ -7,7 +7,7 @@ import androidx.work.WorkerParameters
 import ru.glebik.updater.library.AppUtils
 import ru.glebik.updater.library.consts.InternalConsts
 import ru.glebik.updater.library.http.HttpUtils
-import ru.glebik.updater.library.loader.downloadApk
+import ru.glebik.updater.library.main.loader.downloadApk
 import ru.glebik.updater.library.parser.Parser
 import ru.glebik.updater.library.parser.ParserParameters
 

@@ -7,8 +7,8 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequest
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
-import ru.glebik.updater.library.checker.CheckerParameters
-import ru.glebik.updater.library.checker.UpdateCheckerWorker
+import ru.glebik.updater.library.main.checker.CheckerParameters
+import ru.glebik.updater.library.main.checker.UpdateCheckerWorker
 import ru.glebik.updater.library.consts.InternalConsts
 import ru.glebik.updater.library.init.UpdateConfig
 import ru.glebik.updater.library.notifications.AutoUpdateNotifier
