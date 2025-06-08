@@ -40,37 +40,37 @@ object AutoUpdater {
     lateinit var appVersionHelper: AppVersionHelper
         private set
 
-    // Метод инициализации с возможностью передать кастомные реализации
-//    fun initCustom(
-//        applicationContext: Context,
-//        notifier: AutoUpdateNotifier = DefaultAutoUpdateNotifier(applicationContext),
-//        updateCheckerWorkerRunner: UpdateCheckerWorkerRunner = DefaultUpdateCheckerRunner(
-//            applicationContext
-//        ),
-//        apkDownloader: ApkDownloader = DefaultApkDownloader(
-//            DefaultInstallerWorkerRunner(
-//                applicationContext
-//            )
-//        ),
-//    ) {
-//        this.applicationContext = applicationContext.applicationContext
-//        this.notifier = notifier
-//        this.updateCheckerWorkerRunner = updateCheckerWorkerRunner
-//        this.apkDownloader = apkDownloader
-//
-//
-//        val delegationWorkerFactory = DelegatingWorkerFactory().apply {
-//            addFactory()
-//        }
-//
-//        val config = Configuration.Builder()
-//            .setWorkerFactory(delegationWorkerFactory)
-//            .build()
-//
-//        WorkManager.initialize(applicationContext, config)
-//    }
+    /**
+     * Initializes the AutoUpdater with custom implementations.
+     * Must be called from Application.onCreate.
+     *
+     * @param applicationContext The application context.
+     * @param autoUpdaterConfiguration Configuration containing user-defined implementations of core components.
+     */
+    fun init(
+        applicationContext: Context,
+        autoUpdaterConfiguration: AutoUpdaterConfiguration,
+    ) {
 
-    //Invoke in Application.OnCreate
+        this.applicationContext = applicationContext.applicationContext
+        this.notifier = autoUpdaterConfiguration.notifier
+        this.updateCheckerWorkerRunner = autoUpdaterConfiguration.updateCheckerWorkerRunner
+        this.apkDownloader = autoUpdaterConfiguration.apkDownloader
+        this.workManagerConfigurator = autoUpdaterConfiguration.workManagerConfigurator
+        this.appVersionHelper = autoUpdaterConfiguration.appVersionHelper
+
+        WorkManager.initialize(
+            applicationContext,
+            autoUpdaterConfiguration.workManagerConfigurator.createConfiguration()
+        )
+    }
+
+    /**
+     * Initializes the AutoUpdater with default implementations.
+     * Must be called from Application.onCreate.
+     *
+     * @param applicationContext The application context.
+     */
     fun init(
         applicationContext: Context,
     ) {
