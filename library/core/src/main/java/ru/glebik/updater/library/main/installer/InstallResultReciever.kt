@@ -10,8 +10,12 @@ import android.os.Build
 import android.util.Log
 import androidx.core.content.IntentCompat
 import ru.glebik.updater.library.AutoUpdater
+import ru.glebik.updater.library.notifications.AutoUpdateNotifier
 
 class InstallResultReceiver : BroadcastReceiver() {
+
+    private val notifier : AutoUpdateNotifier
+        get() = AutoUpdater.notifier
 
     override fun onReceive(context: Context, intent: Intent) {
         val status =
@@ -22,7 +26,7 @@ class InstallResultReceiver : BroadcastReceiver() {
         when (status) {
             PackageInstaller.STATUS_SUCCESS -> {
                 Log.d("Installer", "Установка прошла успешно")
-                AutoUpdater.notifier.showSuccessNotification()
+                notifier.showSuccessNotification()
                 removeUpdateFileAfterInstall(context, intent)
             }
 
@@ -54,7 +58,7 @@ class InstallResultReceiver : BroadcastReceiver() {
     }
 
     private fun showConfirmationNotification(confirmationIntent: PendingIntent) {
-        AutoUpdater.notifier.showUserConfirmationNotification(confirmationIntent)
+        notifier.showUserConfirmationNotification(confirmationIntent)
     }
 
     private fun getPendingIntentForManualInstall(context: Context, intent: Intent): PendingIntent? =

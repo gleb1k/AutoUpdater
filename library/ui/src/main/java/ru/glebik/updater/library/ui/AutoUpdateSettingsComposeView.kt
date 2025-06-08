@@ -14,7 +14,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import ru.glebik.updater.library.AutoUpdater
+import ru.glebik.updater.library.consts.InternalConsts.CHECK_URL_EXAMPLE
+import ru.glebik.updater.library.init.UpdateConfig
+import ru.glebik.updater.library.main.checker.CheckerParameters
 import ru.glebik.updater.library.ui.model.AutoUpdateSettingsUiModel
+import java.util.concurrent.TimeUnit
 
 @Composable
 fun AutoUpdateDebugComposeView(
@@ -57,5 +62,22 @@ fun AutoUpdateDebugComposeView(
         ) {
             Text("\uD83D\uDD0D Проверить обновление")
         }
+
+        Button(
+            modifier = Modifier.fillMaxWidth(),
+            onClick = {
+                val checkerParameters = CheckerParameters.default(CHECK_URL_EXAMPLE)
+
+                AutoUpdater.startInstallProcess(
+                    UpdateConfig.Builder.builder()
+                    .setCheckerParameters(checkerParameters)
+                    .setPeriodic() // Choose periodic mode
+                    .setInterval(6, TimeUnit.HOURS) // Set interval
+                    .build())
+            },
+            content = {
+                Text("")
+            }
+        )
     }
 }

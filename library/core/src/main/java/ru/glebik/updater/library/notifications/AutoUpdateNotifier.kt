@@ -7,7 +7,13 @@ import android.content.Context
 import android.content.Intent
 import androidx.core.app.NotificationCompat
 
-class AutoUpdateNotifier(private val context: Context) {
+interface AutoUpdateNotifier {
+    fun showUserConfirmationNotification(pendingIntent: PendingIntent)
+    fun showSuccessNotification()
+    fun cancel()
+}
+
+class DefaultAutoUpdateNotifier(private val context: Context) : AutoUpdateNotifier {
 
     private val notificationManager =
         context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -32,7 +38,7 @@ class AutoUpdateNotifier(private val context: Context) {
     }
 
 
-    fun showUserConfirmationNotification(pendingIntent: PendingIntent) {
+    override fun showUserConfirmationNotification(pendingIntent: PendingIntent) {
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(android.R.drawable.stat_sys_download_done)
             .setContentTitle("Скачана новая версия")
@@ -45,7 +51,7 @@ class AutoUpdateNotifier(private val context: Context) {
         notificationManager.notify(NOTIFICATION_ID, notification)
     }
 
-    fun showSuccessNotification() {
+    override fun showSuccessNotification() {
         val intent = PendingIntent.getActivity(
             context,
             0,
@@ -64,7 +70,7 @@ class AutoUpdateNotifier(private val context: Context) {
         notificationManager.notify(NOTIFICATION_ID, notification)
     }
 
-    fun cancel() {
+    override fun cancel() {
         notificationManager.cancel(NOTIFICATION_ID)
     }
 

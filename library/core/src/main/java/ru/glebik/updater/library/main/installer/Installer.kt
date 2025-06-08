@@ -7,10 +7,15 @@ import android.net.Uri
 import android.os.Build
 import android.os.Process
 import android.util.Log
-import ru.glebik.updater.library.main.loader.getDownloadedApkFile
+import ru.glebik.updater.library.AppUtils
+import java.io.File
 import java.util.zip.ZipFile
 
 object Installer {
+
+    fun getDownloadedApkFile(context: Context): File {
+        return File(context.getExternalFilesDir(null), AppUtils.getAppApkFileName(context))
+    }
 
     fun updateAppWithPackageInstaller(context: Context, apkFileUri: Uri) {
         try {

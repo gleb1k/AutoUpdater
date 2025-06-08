@@ -22,7 +22,6 @@ object Parser {
             apkUrl = apkUrl,
             version = version,
             message = message
-
         )
     }
 }

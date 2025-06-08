@@ -85,15 +85,8 @@ class MainActivity : ComponentActivity() {
 
 //                    val context = LocalContext.current
 //
-//                    Text("AppVersion: ${AppUtils.getAppVersion(context)}, AppVersionCode: ${AppUtils.getAppVersionCode(context)} " )
-//                    Button(
-//                        onClick = {
-//                            AutoUpdater.startInstallProcess(updateConfig)
-//                        },
-//                        content = {
-//                            Text("Install")
-//                        }
-//                    )
+                  //  Text("AppVersion: ${AppUtils.getAppVersion(context)}, AppVersionCode: ${AppUtils.getAppVersionCode(context)} " )
+
                     Column(
                         Modifier
                             .padding(innerPadding)
@@ -106,21 +99,5 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    AutoUpdaterTheme {
-        Greeting("Android")
     }
 }

@@ -9,6 +9,7 @@ import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
+import ru.glebik.updater.library.main.loader.ApkDownloader
 
 class InstallerWorker(
     private val appContext: Context,
@@ -28,23 +29,4 @@ class InstallerWorker(
         return Result.success()
     }
 
-    companion object {
-
-        private const val URI_KEY = "URI_KEY"
-
-        fun launchOneTimeWorker(
-            applicationContext: Context,
-            apkUri: Uri
-        ) {
-            val workRequest = OneTimeWorkRequest.Builder(InstallerWorker::class.java)
-                .setInputData(workDataOf(URI_KEY to apkUri.toString()))
-                .build()
-
-            WorkManager.getInstance(applicationContext).enqueueUniqueWork(
-                "INSTALLER_WORKER",
-                ExistingWorkPolicy.REPLACE,
-                workRequest
-            )
-        }
-    }
 }
