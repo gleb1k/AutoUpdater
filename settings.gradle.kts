@@ -21,4 +21,6 @@ dependencyResolutionManagement {
 
 rootProject.name = "AutoUpdater"
 include(":app")
+include(":library:core")
 include(":library")
+include(":library:ui")

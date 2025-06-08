@@ -4,23 +4,16 @@ plugins {
 }
 
 android {
-    namespace = "ru.glebik.updater.library"
-    compileSdk = 34
+    namespace = "ru.glebik.updater.library.core"
+    compileSdk = 35
 
     defaultConfig {
         minSdk = 26
-
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        consumerProguardFiles("consumer-rules.pro")
     }
 
     buildTypes {
         release {
             isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
         }
     }
     compileOptions {
@@ -36,6 +29,5 @@ dependencies {
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
-
     implementation(libs.worker)
 }
