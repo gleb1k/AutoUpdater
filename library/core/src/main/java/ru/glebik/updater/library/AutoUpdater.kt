@@ -1,12 +1,11 @@
 package ru.glebik.updater.library
 
+import android.annotation.SuppressLint
 import android.content.Context
-import androidx.work.DelegatingWorkerFactory
 import androidx.work.WorkManager
 import ru.glebik.updater.library.init.UpdateConfig
 import ru.glebik.updater.library.main.checker.DefaultUpdateCheckerRunner
 import ru.glebik.updater.library.main.checker.DefaultUpdateCheckerWorkerRequestFactory
-import ru.glebik.updater.library.main.checker.UpdateCheckerWorkerFactory
 import ru.glebik.updater.library.main.checker.UpdateCheckerWorkerRunner
 import ru.glebik.updater.library.main.installer.DefaultInstallerWorkerRequestFactory
 import ru.glebik.updater.library.main.installer.DefaultInstallerWorkerRunner
@@ -15,6 +14,7 @@ import ru.glebik.updater.library.main.loader.DefaultApkDownloader
 import ru.glebik.updater.library.models.mapper.CheckerParamsMapper
 import ru.glebik.updater.library.notifications.AutoUpdateNotifier
 import ru.glebik.updater.library.notifications.DefaultAutoUpdateNotifier
+import ru.glebik.updater.library.utils.AppVersionHelper
 import ru.glebik.updater.library.workmanager.DefaultWorkManagerConfigurator
 import ru.glebik.updater.library.workmanager.WorkManagerConfigurator
 
@@ -34,6 +34,10 @@ object AutoUpdater {
         private set
 
     lateinit var workManagerConfigurator: WorkManagerConfigurator
+        private set
+
+    @SuppressLint("StaticFieldLeak")
+    lateinit var appVersionHelper: AppVersionHelper
         private set
 
     // Метод инициализации с возможностью передать кастомные реализации
@@ -83,16 +87,25 @@ object AutoUpdater {
         val defaultApkDownloader =
             DefaultApkDownloader(defaultInstallerWorkerRunner)
 
+        val appVersionHelper = AppVersionHelper(applicationContext)
+
         val defaultWorkManagerConfigurator =
-            DefaultWorkManagerConfigurator(DefaultApkDownloader(defaultInstallerWorkerRunner))
+            DefaultWorkManagerConfigurator(
+                DefaultApkDownloader(defaultInstallerWorkerRunner),
+                appVersionHelper
+            )
 
         this.applicationContext = applicationContext.applicationContext
         this.notifier = defaultNotifier
         this.updateCheckerWorkerRunner = defaultUpdateCheckerWorkerRunner
         this.apkDownloader = defaultApkDownloader
         this.workManagerConfigurator = defaultWorkManagerConfigurator
+        this.appVersionHelper = appVersionHelper
 
-        WorkManager.initialize(applicationContext, defaultWorkManagerConfigurator.createConfiguration())
+        WorkManager.initialize(
+            applicationContext,
+            defaultWorkManagerConfigurator.createConfiguration()
+        )
     }
 
     fun startInstallProcess(updateConfig: UpdateConfig) {

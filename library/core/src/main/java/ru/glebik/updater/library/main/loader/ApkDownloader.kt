@@ -10,7 +10,7 @@ import android.net.Uri
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
-import ru.glebik.updater.library.AppUtils
+import ru.glebik.updater.library.utils.AppUtils
 import ru.glebik.updater.library.main.installer.InstallerWorkerRunner
 import java.io.File
 

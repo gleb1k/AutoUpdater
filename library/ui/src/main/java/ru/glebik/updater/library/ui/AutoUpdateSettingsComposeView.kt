@@ -41,7 +41,7 @@ fun AutoUpdateDebugComposeView(
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("📶 Только по Wi-Fi:")
+            Text("📶 Установка только по Wi-Fi:")
             Switch(
                 checked = model.onlyWifi,
                 onCheckedChange = onToggleConnectionPreference
@@ -52,32 +52,36 @@ fun AutoUpdateDebugComposeView(
         Text("\uD83D\uDD52 Последняя проверка: ${model.lastCheckTime}")
         Text("\uD83D\uDCE5 Последняя загрузка: ${model.lastDownloadTime}")
 
-        if (model.isUpdateAvailable) {
-            Text("\uD83D\uDD04 Доступна новая версия")
-        }
+        when (model.isUpdateAvailable) {
+            true -> {
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = {
+                        val checkerParameters = CheckerParameters.default(CHECK_URL_EXAMPLE)
 
-        Button(
-            onClick = onCheckUpdateClick,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("\uD83D\uDD0D Проверить обновление")
-        }
-
-        Button(
-            modifier = Modifier.fillMaxWidth(),
-            onClick = {
-                val checkerParameters = CheckerParameters.default(CHECK_URL_EXAMPLE)
-
-                AutoUpdater.startInstallProcess(
-                    UpdateConfig.Builder.builder()
-                    .setCheckerParameters(checkerParameters)
-                    .setPeriodic() // Choose periodic mode
-                    .setInterval(6, TimeUnit.HOURS) // Set interval
-                    .build())
-            },
-            content = {
-                Text("")
+                        AutoUpdater.startInstallProcess(
+                            UpdateConfig.Builder.builder()
+                                .setCheckerParameters(checkerParameters)
+                                .setPeriodic() // Choose periodic mode
+                                .setInterval(6, TimeUnit.HOURS) // Set interval
+                                .build()
+                        )
+                    },
+                    content = {
+                        Text("Проверить наличие обновления")
+                    }
+                )
             }
-        )
+
+            false -> {
+                Button(
+                    onClick = onCheckUpdateClick,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Проверить обновление")
+                }
+            }
+        }
+
     }
 }

@@ -7,7 +7,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Process
 import android.util.Log
-import ru.glebik.updater.library.AppUtils
+import ru.glebik.updater.library.utils.AppUtils
 import java.io.File
 import java.util.zip.ZipFile
 

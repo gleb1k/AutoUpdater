@@ -4,7 +4,7 @@ import android.content.Context
 import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import ru.glebik.updater.library.AppUtils
+import ru.glebik.updater.library.utils.AppVersionHelper
 import ru.glebik.updater.library.consts.InternalConsts
 import ru.glebik.updater.library.http.HttpUtils
 import ru.glebik.updater.library.main.loader.ApkDownloader
@@ -15,6 +15,7 @@ class UpdateCheckerWorker(
     appContext: Context,
     workerParams: WorkerParameters,
     private val apkDownloader: ApkDownloader,
+    private val appVersionHelper: AppVersionHelper,
 ) : CoroutineWorker(appContext, workerParams) {
 
     override suspend fun doWork(): Result {
@@ -40,9 +41,9 @@ class UpdateCheckerWorker(
             val checkModel = Parser.parseJson(response, parserParameters)
             Log.d(InternalConsts.LIBRARY_TAG, checkModel.toString())
 
-            //if (needToDownload && checkModel.version > AppUtils.getAppVersionCode(appContext)) {
+            if (needToDownload && checkModel.version > appVersionHelper.getAppVersionCode()) {
                 apkDownloader.download(applicationContext, checkModel.apkUrl)
-            //}
+            }
 
             Result.success()
         } catch (e: Exception) {
