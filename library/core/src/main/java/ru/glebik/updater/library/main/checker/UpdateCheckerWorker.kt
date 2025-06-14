@@ -4,18 +4,20 @@ import android.content.Context
 import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import ru.glebik.updater.library.utils.AppVersionHelper
 import ru.glebik.updater.library.consts.InternalConsts
 import ru.glebik.updater.library.http.HttpUtils
 import ru.glebik.updater.library.main.loader.ApkDownloader
 import ru.glebik.updater.library.parser.Parser
 import ru.glebik.updater.library.parser.ParserParameters
+import ru.glebik.updater.library.pref.AutoUpdateSharedPrefManager
+import ru.glebik.updater.library.utils.AppVersionHelper
 
 class UpdateCheckerWorker(
     appContext: Context,
     workerParams: WorkerParameters,
     private val apkDownloader: ApkDownloader,
     private val appVersionHelper: AppVersionHelper,
+    private val prefManager: AutoUpdateSharedPrefManager,
 ) : CoroutineWorker(appContext, workerParams) {
 
     override suspend fun doWork(): Result {
@@ -33,16 +35,21 @@ class UpdateCheckerWorker(
                 inputData.getBoolean(InternalConsts.INTERNAL_KEY_FOR_NEED_TO_DOWNLOAD, false)
 
             val response = HttpUtils.get(checkUrl) ?: return Result.failure()
+
+            prefManager.lastCheckTimestamp = System.currentTimeMillis()
+
             val parserParameters = ParserParameters(
                 keyApkUrl = keyApkUrl,
                 keyVersion = keyVersion,
                 keyUpdateMessage = keyUpdateMessage
             )
-            val checkModel = Parser.parseJson(response, parserParameters)
-            Log.d(InternalConsts.LIBRARY_TAG, checkModel.toString())
+            val availableUpdate = Parser.parseJson(response, parserParameters)
+            Log.d(InternalConsts.LIBRARY_TAG, availableUpdate.toString())
 
-            if (needToDownload && checkModel.version > appVersionHelper.getAppVersionCode()) {
-                apkDownloader.download(applicationContext, checkModel.apkUrl)
+            prefManager.availableUpdate = availableUpdate
+
+            if (needToDownload && availableUpdate.version > appVersionHelper.getAppVersionCode()) {
+                apkDownloader.download(applicationContext, availableUpdate.apkUrl)
             }
 
             Result.success()

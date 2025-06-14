@@ -4,6 +4,7 @@ import ru.glebik.updater.library.main.checker.UpdateCheckerWorkerRunner
 import ru.glebik.updater.library.main.installer.InstallerWorkerRunner
 import ru.glebik.updater.library.main.loader.ApkDownloader
 import ru.glebik.updater.library.notifications.AutoUpdateNotifier
+import ru.glebik.updater.library.pref.AutoUpdateSharedPrefManager
 import ru.glebik.updater.library.utils.AppVersionHelper
 import ru.glebik.updater.library.workmanager.WorkManagerConfigurator
 
@@ -25,4 +26,5 @@ data class AutoUpdaterConfiguration(
     val apkDownloader: ApkDownloader,
     val appVersionHelper: AppVersionHelper,
     val workManagerConfigurator: WorkManagerConfigurator,
+    val prefManager: AutoUpdateSharedPrefManager,
 )

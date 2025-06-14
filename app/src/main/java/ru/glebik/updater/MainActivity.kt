@@ -14,16 +14,16 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
-import ru.glebik.updater.library.main.checker.CheckerParameters
+import ru.glebik.updater.library.AutoUpdater
 import ru.glebik.updater.library.consts.InternalConsts.CHECK_URL_EXAMPLE
 import ru.glebik.updater.library.init.UpdateConfig
+import ru.glebik.updater.library.main.checker.CheckerParameters
 import ru.glebik.updater.library.ui.AutoUpdateSettingsScreen
+import ru.glebik.updater.library.ui.vm.AutoUpdateDebugViewModelFactory
 import ru.glebik.updater.ui.theme.AutoUpdaterTheme
 import java.util.concurrent.TimeUnit
 
@@ -82,11 +82,6 @@ class MainActivity : ComponentActivity() {
         setContent {
             AutoUpdaterTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-
-//                    val context = LocalContext.current
-//
-                  //  Text("AppVersion: ${AppUtils.getAppVersion(context)}, AppVersionCode: ${AppUtils.getAppVersionCode(context)} " )
-
                     Column(
                         Modifier
                             .padding(innerPadding)
@@ -94,7 +89,13 @@ class MainActivity : ComponentActivity() {
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
-                        AutoUpdateSettingsScreen(viewModel = viewModel())
+                        val factory = remember {
+                            AutoUpdateDebugViewModelFactory(
+                                AutoUpdater.appVersionHelper,
+                                AutoUpdater.prefManager
+                            )
+                        }
+                        AutoUpdateSettingsScreen(viewModel = viewModel(factory = factory))
                     }
                 }
             }

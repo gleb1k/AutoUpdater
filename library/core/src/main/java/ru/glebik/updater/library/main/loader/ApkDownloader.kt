@@ -12,6 +12,7 @@ import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import ru.glebik.updater.library.utils.AppUtils
 import ru.glebik.updater.library.main.installer.InstallerWorkerRunner
+import ru.glebik.updater.library.pref.AutoUpdateSharedPrefManager
 import java.io.File
 
 interface ApkDownloader {

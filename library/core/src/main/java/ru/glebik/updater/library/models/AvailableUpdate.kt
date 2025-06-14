@@ -1,6 +1,6 @@
 package ru.glebik.updater.library.models
 
-data class CheckModel(
+data class AvailableUpdate(
     val apkUrl: String,
     val version: Long,
     val message: String?,

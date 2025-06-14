@@ -11,7 +11,6 @@ data class AutoUpdateSettingsState(
                 appVersion = "",
                 isUpdateAvailable = false,
                 lastCheckTime = "",
-                lastDownloadTime = "",
                 onlyWifi = false
             )
         )

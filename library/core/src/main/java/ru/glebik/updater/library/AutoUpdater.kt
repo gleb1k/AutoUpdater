@@ -14,6 +14,8 @@ import ru.glebik.updater.library.main.loader.DefaultApkDownloader
 import ru.glebik.updater.library.models.mapper.CheckerParamsMapper
 import ru.glebik.updater.library.notifications.AutoUpdateNotifier
 import ru.glebik.updater.library.notifications.DefaultAutoUpdateNotifier
+import ru.glebik.updater.library.pref.AutoUpdateSharedPrefManager
+import ru.glebik.updater.library.pref.DefaultAutoUpdateSharedPrefManager
 import ru.glebik.updater.library.utils.AppVersionHelper
 import ru.glebik.updater.library.workmanager.DefaultWorkManagerConfigurator
 import ru.glebik.updater.library.workmanager.WorkManagerConfigurator
@@ -40,6 +42,10 @@ object AutoUpdater {
     lateinit var appVersionHelper: AppVersionHelper
         private set
 
+    @SuppressLint("StaticFieldLeak")
+    lateinit var prefManager: AutoUpdateSharedPrefManager
+        private set
+
     /**
      * Initializes the AutoUpdater with custom implementations.
      * Must be called from Application.onCreate.
@@ -58,6 +64,7 @@ object AutoUpdater {
         this.apkDownloader = autoUpdaterConfiguration.apkDownloader
         this.workManagerConfigurator = autoUpdaterConfiguration.workManagerConfigurator
         this.appVersionHelper = autoUpdaterConfiguration.appVersionHelper
+        this.prefManager = autoUpdaterConfiguration.prefManager
 
         WorkManager.initialize(
             applicationContext,
@@ -89,10 +96,14 @@ object AutoUpdater {
 
         val appVersionHelper = AppVersionHelper(applicationContext)
 
+        val defaultAutoUpdateSharedPrefManager =
+            DefaultAutoUpdateSharedPrefManager(applicationContext)
+
         val defaultWorkManagerConfigurator =
             DefaultWorkManagerConfigurator(
                 DefaultApkDownloader(defaultInstallerWorkerRunner),
-                appVersionHelper
+                appVersionHelper,
+                defaultAutoUpdateSharedPrefManager,
             )
 
         this.applicationContext = applicationContext.applicationContext
@@ -101,6 +112,7 @@ object AutoUpdater {
         this.apkDownloader = defaultApkDownloader
         this.workManagerConfigurator = defaultWorkManagerConfigurator
         this.appVersionHelper = appVersionHelper
+        this.prefManager = defaultAutoUpdateSharedPrefManager
 
         WorkManager.initialize(
             applicationContext,
@@ -108,13 +120,19 @@ object AutoUpdater {
         )
     }
 
-    fun startInstallProcess(updateConfig: UpdateConfig) {
+    fun checkUpdate(updateConfig: UpdateConfig) {
         val inputData = CheckerParamsMapper.map(updateConfig.checkerParameters)
 
         if (updateConfig.isPeriodic) {
             updateCheckerWorkerRunner.runPeriodic(updateConfig, inputData)
         } else {
             updateCheckerWorkerRunner.runOneTime(inputData)
+        }
+    }
+
+    fun downloadAndInstallAvailableUpdate() {
+        prefManager.availableUpdate?.let {
+            apkDownloader.download(applicationContext, it.apkUrl)
         }
     }
 }

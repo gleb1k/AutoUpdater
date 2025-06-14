@@ -50,7 +50,6 @@ fun AutoUpdateDebugComposeView(
 
         Text("\uD83D\uDCE6 Версия приложения: ${model.appVersion}")
         Text("\uD83D\uDD52 Последняя проверка: ${model.lastCheckTime}")
-        Text("\uD83D\uDCE5 Последняя загрузка: ${model.lastDownloadTime}")
 
         when (model.isUpdateAvailable) {
             true -> {
@@ -59,7 +58,7 @@ fun AutoUpdateDebugComposeView(
                     onClick = {
                         val checkerParameters = CheckerParameters.default(CHECK_URL_EXAMPLE)
 
-                        AutoUpdater.startInstallProcess(
+                        AutoUpdater.checkUpdate(
                             UpdateConfig.Builder.builder()
                                 .setCheckerParameters(checkerParameters)
                                 .setPeriodic() // Choose periodic mode
