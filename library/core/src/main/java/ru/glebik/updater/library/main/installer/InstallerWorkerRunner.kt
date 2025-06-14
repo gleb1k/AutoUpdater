@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.Uri
 import androidx.work.ExistingWorkPolicy
 import androidx.work.WorkManager
+import java.util.UUID
 
 interface InstallerWorkerRunner {
     fun runOneTime(apkUri: Uri)

@@ -18,14 +18,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
-import ru.glebik.updater.library.AutoUpdater
-import ru.glebik.updater.library.consts.InternalConsts.CHECK_URL_EXAMPLE
+import androidx.work.WorkManager
+import ru.glebik.updater.consts.getSampleOneTimeCheckerParameters
 import ru.glebik.updater.library.init.UpdateConfig
-import ru.glebik.updater.library.main.checker.CheckerParameters
 import ru.glebik.updater.library.ui.AutoUpdateSettingsScreen
 import ru.glebik.updater.library.ui.vm.AutoUpdateDebugViewModelFactory
 import ru.glebik.updater.ui.theme.AutoUpdaterTheme
-import java.util.concurrent.TimeUnit
 
 
 class MainActivity : ComponentActivity() {
@@ -70,14 +68,6 @@ class MainActivity : ComponentActivity() {
 //            )
 //        }
 
-        val checkerParameters = CheckerParameters.default(CHECK_URL_EXAMPLE)
-
-        val updateConfig = UpdateConfig.Builder.builder()
-            .setCheckerParameters(checkerParameters)
-            .setPeriodic() // Choose periodic mode
-            .setInterval(6, TimeUnit.HOURS) // Set interval
-            .build()
-
         enableEdgeToEdge()
         setContent {
             AutoUpdaterTheme {
@@ -91,8 +81,8 @@ class MainActivity : ComponentActivity() {
                     ) {
                         val factory = remember {
                             AutoUpdateDebugViewModelFactory(
-                                AutoUpdater.appVersionHelper,
-                                AutoUpdater.prefManager
+                                WorkManager.getInstance(applicationContext),
+                                getSampleOneTimeCheckerParameters(),
                             )
                         }
                         AutoUpdateSettingsScreen(viewModel = viewModel(factory = factory))

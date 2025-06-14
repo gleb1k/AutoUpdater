@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import androidx.work.WorkManager
 import ru.glebik.updater.library.init.UpdateConfig
+import ru.glebik.updater.library.main.checker.CheckerParameters
 import ru.glebik.updater.library.main.checker.DefaultUpdateCheckerRunner
 import ru.glebik.updater.library.main.checker.DefaultUpdateCheckerWorkerRequestFactory
 import ru.glebik.updater.library.main.checker.UpdateCheckerWorkerRunner
@@ -19,6 +20,7 @@ import ru.glebik.updater.library.pref.DefaultAutoUpdateSharedPrefManager
 import ru.glebik.updater.library.utils.AppVersionHelper
 import ru.glebik.updater.library.workmanager.DefaultWorkManagerConfigurator
 import ru.glebik.updater.library.workmanager.WorkManagerConfigurator
+import java.util.UUID
 
 
 object AutoUpdater {
@@ -120,13 +122,18 @@ object AutoUpdater {
         )
     }
 
-    fun checkUpdate(updateConfig: UpdateConfig) {
-        val inputData = CheckerParamsMapper.map(updateConfig.checkerParameters)
+    fun checkUpdate(updateConfig: UpdateConfig): UUID {
+        val inputData = CheckerParamsMapper.map(
+            updateConfig.checkerParameters,
+            updateConfig.needToDownloadAfterCheck
+        )
 
-        if (updateConfig.isPeriodic) {
-            updateCheckerWorkerRunner.runPeriodic(updateConfig, inputData)
-        } else {
-            updateCheckerWorkerRunner.runOneTime(inputData)
+        return when (updateConfig.checkerParameters) {
+            is CheckerParameters.OneTime -> updateCheckerWorkerRunner.runOneTime(inputData)
+            is CheckerParameters.Periodic -> updateCheckerWorkerRunner.runPeriodic(
+                updateConfig.checkerParameters,
+                inputData
+            )
         }
     }
 

@@ -8,9 +8,9 @@ data class AutoUpdateSettingsState(
     companion object {
         val EMPTY = AutoUpdateSettingsState(
             AutoUpdateSettingsUiModel(
-                appVersion = "",
-                isUpdateAvailable = false,
-                lastCheckTime = "",
+                appVersion = "-",
+                availableUpdate = null,
+                lastCheckTime = null,
                 onlyWifi = false
             )
         )

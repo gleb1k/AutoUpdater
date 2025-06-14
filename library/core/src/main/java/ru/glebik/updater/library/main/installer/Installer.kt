@@ -7,13 +7,14 @@ import android.net.Uri
 import android.os.Build
 import android.os.Process
 import android.util.Log
+import ru.glebik.updater.library.AutoUpdater
 import ru.glebik.updater.library.utils.AppUtils
 import java.io.File
 import java.util.zip.ZipFile
 
 object Installer {
 
-    fun getDownloadedApkFile(context: Context): File {
+    private fun getDownloadedApkFile(context: Context): File {
         return File(context.getExternalFilesDir(null), AppUtils.getAppApkFileName(context))
     }
 
@@ -66,6 +67,7 @@ object Installer {
             // Завершаем установку
             installSession.commit(resultPendingIntent.intentSender)
             installSession.close()
+            AutoUpdater.prefManager.availableUpdate = null
         } catch (e: Exception) {
             Log.d("Installer", "error:$e")
         }

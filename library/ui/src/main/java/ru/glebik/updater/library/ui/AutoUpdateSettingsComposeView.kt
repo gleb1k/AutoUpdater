@@ -14,18 +14,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import ru.glebik.updater.library.AutoUpdater
-import ru.glebik.updater.library.consts.InternalConsts.CHECK_URL_EXAMPLE
-import ru.glebik.updater.library.init.UpdateConfig
-import ru.glebik.updater.library.main.checker.CheckerParameters
 import ru.glebik.updater.library.ui.model.AutoUpdateSettingsUiModel
-import java.util.concurrent.TimeUnit
 
 @Composable
 fun AutoUpdateDebugComposeView(
     modifier: Modifier = Modifier,
     model: AutoUpdateSettingsUiModel,
     onCheckUpdateClick: () -> Unit,
+    downloadAndInstallUpdate: () -> Unit,
     onToggleConnectionPreference: (Boolean) -> Unit,
 ) {
     Column(
@@ -51,21 +47,11 @@ fun AutoUpdateDebugComposeView(
         Text("\uD83D\uDCE6 Версия приложения: ${model.appVersion}")
         Text("\uD83D\uDD52 Последняя проверка: ${model.lastCheckTime}")
 
-        when (model.isUpdateAvailable) {
+        when (model.availableUpdate == null) {
             true -> {
                 Button(
                     modifier = Modifier.fillMaxWidth(),
-                    onClick = {
-                        val checkerParameters = CheckerParameters.default(CHECK_URL_EXAMPLE)
-
-                        AutoUpdater.checkUpdate(
-                            UpdateConfig.Builder.builder()
-                                .setCheckerParameters(checkerParameters)
-                                .setPeriodic() // Choose periodic mode
-                                .setInterval(6, TimeUnit.HOURS) // Set interval
-                                .build()
-                        )
-                    },
+                    onClick = onCheckUpdateClick,
                     content = {
                         Text("Проверить наличие обновления")
                     }
@@ -73,11 +59,14 @@ fun AutoUpdateDebugComposeView(
             }
 
             false -> {
+
+                Text("Доступна новая версия!")
+
                 Button(
-                    onClick = onCheckUpdateClick,
-                    modifier = Modifier.fillMaxWidth()
+                    onClick = downloadAndInstallUpdate,
+                    modifier = Modifier.fillMaxWidth(),
                 ) {
-                    Text("Проверить обновление")
+                    Text("Скачать и установить обновление")
                 }
             }
         }

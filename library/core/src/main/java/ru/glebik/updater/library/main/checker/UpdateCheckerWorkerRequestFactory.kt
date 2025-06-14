@@ -7,7 +7,7 @@ import ru.glebik.updater.library.init.UpdateConfig
 
 interface UpdateCheckerWorkerRequestFactory {
     fun createPeriodicRequest(
-        config: UpdateConfig,
+        periodicCheckerParameters: CheckerParameters.Periodic,
         inputData: Data
     ): PeriodicWorkRequest
 
@@ -19,13 +19,13 @@ interface UpdateCheckerWorkerRequestFactory {
 class DefaultUpdateCheckerWorkerRequestFactory : UpdateCheckerWorkerRequestFactory {
 
     override fun createPeriodicRequest(
-        config: UpdateConfig,
+        periodicCheckerParameters: CheckerParameters.Periodic,
         inputData: Data
     ): PeriodicWorkRequest {
         return PeriodicWorkRequest.Builder(
             UpdateCheckerWorker::class.java,
-            config.repeatInterval,
-            config.timeUnit
+            periodicCheckerParameters.repeatInterval,
+            periodicCheckerParameters.timeUnit
         )
             .setInputData(inputData)
             .build()

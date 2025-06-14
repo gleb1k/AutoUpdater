@@ -4,12 +4,12 @@ import android.content.Context
 import androidx.work.Data
 import androidx.work.ExistingWorkPolicy
 import androidx.work.WorkManager
-import ru.glebik.updater.library.init.UpdateConfig
+import java.util.UUID
 
 
 interface UpdateCheckerWorkerRunner {
-    fun runPeriodic(updateConfig: UpdateConfig, inputData: Data)
-    fun runOneTime(inputData: Data)
+    fun runPeriodic(periodicCheckerParameters: CheckerParameters.Periodic, inputData: Data): UUID
+    fun runOneTime(inputData: Data): UUID
 }
 
 class DefaultUpdateCheckerRunner(
@@ -17,18 +17,23 @@ class DefaultUpdateCheckerRunner(
     private val factory: UpdateCheckerWorkerRequestFactory = DefaultUpdateCheckerWorkerRequestFactory()
 ) : UpdateCheckerWorkerRunner {
 
-    override fun runPeriodic(updateConfig: UpdateConfig, inputData: Data) {
-        val request = factory.createPeriodicRequest(updateConfig, inputData)
+    override fun runPeriodic(
+        periodicCheckerParameters: CheckerParameters.Periodic,
+        inputData: Data
+    ): UUID {
+        val request = factory.createPeriodicRequest(periodicCheckerParameters, inputData)
         WorkManager.getInstance(context).enqueue(request)
+        return request.id
     }
 
-    override fun runOneTime(inputData: Data) {
+    override fun runOneTime(inputData: Data): UUID {
         val request = factory.createOneTimeRequest(inputData)
         WorkManager.getInstance(context).enqueueUniqueWork(
             UPDATE_CHECKER_WORKER_NAME,
             ExistingWorkPolicy.KEEP,
             request
         )
+        return request.id
     }
 
     companion object {

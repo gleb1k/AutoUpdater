@@ -20,7 +20,7 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "AutoUpdater"
-include(":app")
+include(":sample")
 include(":library:core")
 include(":library")
 include(":library:ui")

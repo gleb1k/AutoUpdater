@@ -1,8 +1,10 @@
 package ru.glebik.updater.library.ui.model
 
+import ru.glebik.updater.library.models.AvailableUpdate
+
 data class AutoUpdateSettingsUiModel(
     val appVersion: String,
     val lastCheckTime: String?,
-    val isUpdateAvailable: Boolean,
+    val availableUpdate: AvailableUpdate?,
     val onlyWifi: Boolean,
 )

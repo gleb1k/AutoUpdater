@@ -5,6 +5,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ru.glebik.updater.library.ui.vm.AutoUpdateDebugViewModel
+import ru.glebik.updater.library.ui.vm.AutoUpdateSettingsIntent
 
 @Composable
 fun AutoUpdateSettingsScreen(
@@ -16,7 +17,14 @@ fun AutoUpdateSettingsScreen(
     AutoUpdateDebugComposeView(
         modifier = Modifier,
         model = state.model,
-        onCheckUpdateClick = {},
-        onToggleConnectionPreference = {}
+        onCheckUpdateClick = {
+            viewModel.handleIntent(AutoUpdateSettingsIntent.CheckUpdate)
+        },
+        onToggleConnectionPreference = {
+            viewModel.handleIntent(AutoUpdateSettingsIntent.ToggleWifi(it))
+        },
+        downloadAndInstallUpdate = {
+            viewModel.handleIntent(AutoUpdateSettingsIntent.DownloadAndInstallUpdate)
+        }
     )
 }
