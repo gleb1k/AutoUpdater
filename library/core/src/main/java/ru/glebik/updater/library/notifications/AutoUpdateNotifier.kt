@@ -6,6 +6,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import androidx.core.app.NotificationCompat
+import ru.glebik.updater.library.core.R
 
 interface AutoUpdateNotifier {
     fun showUserConfirmationNotification(pendingIntent: PendingIntent)
@@ -25,24 +26,22 @@ class DefaultAutoUpdateNotifier(private val context: Context) : AutoUpdateNotifi
     private fun createNotificationChannel() {
         val channel = NotificationChannel(
             CHANNEL_ID,
-            CHANNEL_NAME,
+            context.getString(R.string.update_channel_name),
             NotificationManager.IMPORTANCE_DEFAULT
         ).apply {
-            description = "Уведомления от системы автообновлений"
+            description = context.getString(R.string.update_channel_description)
             enableVibration(true)
             enableLights(true)
             setShowBadge(true)
-
         }
         notificationManager.createNotificationChannel(channel)
     }
 
-
     override fun showUserConfirmationNotification(pendingIntent: PendingIntent) {
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(android.R.drawable.stat_sys_download_done)
-            .setContentTitle("Скачана новая версия")
-            .setContentText("Для установки необходимо будет дать разрешения")
+            .setContentTitle(context.getString(R.string.update_downloaded_title))
+            .setContentText(context.getString(R.string.update_downloaded_description))
             .setAutoCancel(true)
             .setSilent(false)
             .setContentIntent(pendingIntent)
@@ -60,8 +59,8 @@ class DefaultAutoUpdateNotifier(private val context: Context) : AutoUpdateNotifi
         )
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(android.R.drawable.stat_sys_download_done)
-            .setContentTitle("Обновление завершено")
-            .setContentText("Приложение успешно обновлено.")
+            .setContentTitle(context.getString(R.string.update_success_title))
+            .setContentText(context.getString(R.string.update_success_description))
             .setAutoCancel(true)
             .setSilent(false)
             .setContentIntent(intent)
@@ -77,7 +76,5 @@ class DefaultAutoUpdateNotifier(private val context: Context) : AutoUpdateNotifi
     companion object {
         private const val NOTIFICATION_ID = 1001
         private const val CHANNEL_ID = "auto_update_channel"
-        private const val CHANNEL_NAME = "Auto Update Notifications"
-
     }
 }

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="update_downloaded_title">Скачана новая версия</string>
+    <string name="update_downloaded_description">Для установки необходимо будет дать разрешения</string>
+    <string name="update_success_title">Обновление завершено</string>
+    <string name="update_success_description">Приложение успешно обновлено</string>
+    <string name="update_channel_name">Уведомления автообновлений</string>
+    <string name="update_channel_description">Уведомления от системы автообновлений</string>
+
+</resources>

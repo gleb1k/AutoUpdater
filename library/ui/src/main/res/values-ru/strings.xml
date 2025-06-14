@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="auto_update_settings_title">Настройки автообновления</string>
+    <string name="section_network">Сеть</string>
+    <string name="only_wifi">📶 Только по Wi-Fi</string>
+    <string name="section_info">Информация</string>
+    <string name="app_version">📦 Версия приложения: %1$s</string>
+    <string name="last_check">🕒 Последняя проверка: %1$s</string>
+    <string name="section_update">Обновление</string>
+    <string name="check_for_update">Проверить наличие обновления</string>
+    <string name="new_version_available">🚀 Доступна новая версия!</string>
+    <string name="download_and_install">Скачать и установить обновление</string>
+</resources>

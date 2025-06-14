@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="auto_update_settings_title">AutoUpdate Settings</string>
+    <string name="section_network">Network</string>
+    <string name="only_wifi">📶 Wi-Fi only</string>
+    <string name="section_info">Info</string>
+    <string name="app_version">📦 App version: %1$s</string>
+    <string name="last_check">🕒 Last check: %1$s</string>
+    <string name="section_update">Update</string>
+    <string name="check_for_update">Check for update</string>
+    <string name="new_version_available">🚀 New version available!</string>
+    <string name="download_and_install">Download and install update</string>
+</resources>

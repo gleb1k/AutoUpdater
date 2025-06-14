@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="update_downloaded_title">New Version Downloaded</string>
+    <string name="update_downloaded_description">Permissions are required to install the update</string>
+    <string name="update_success_title">Update Completed</string>
+    <string name="update_success_description">The application has been successfully updated</string>
+    <string name="update_channel_name">Auto Update Notifications</string>
+    <string name="update_channel_description">Notifications from the auto-update system</string>
+</resources>
