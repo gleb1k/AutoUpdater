@@ -3,6 +3,7 @@ package ru.glebik.updater.library.workmanager
 import androidx.work.Configuration
 import ru.glebik.updater.library.main.checker.UpdateCheckerWorkerFactory
 import ru.glebik.updater.library.main.loader.ApkDownloader
+import ru.glebik.updater.library.notifications.AutoUpdateNotifier
 import ru.glebik.updater.library.pref.AutoUpdateSharedPrefManager
 import ru.glebik.updater.library.utils.AppVersionHelper
 
@@ -26,11 +27,12 @@ class DefaultWorkManagerConfigurator(
     private val apkDownloader: ApkDownloader,
     private val appVersionHelper: AppVersionHelper,
     private val prefManager: AutoUpdateSharedPrefManager,
+    private val notifier: AutoUpdateNotifier,
 ) : WorkManagerConfigurator {
 
     override fun createConfiguration(): Configuration {
         return Configuration.Builder()
-            .setWorkerFactory(UpdateCheckerWorkerFactory(apkDownloader, appVersionHelper, prefManager))
+            .setWorkerFactory(UpdateCheckerWorkerFactory(apkDownloader, appVersionHelper, prefManager, notifier))
             .build()
     }
 }

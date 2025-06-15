@@ -11,6 +11,7 @@ import ru.glebik.updater.library.core.R
 interface AutoUpdateNotifier {
     fun showUserConfirmationNotification(pendingIntent: PendingIntent)
     fun showSuccessNotification()
+    fun showUpdateAvailableNotification()
     fun cancel()
 }
 
@@ -27,7 +28,7 @@ class DefaultAutoUpdateNotifier(private val context: Context) : AutoUpdateNotifi
         val channel = NotificationChannel(
             CHANNEL_ID,
             context.getString(R.string.update_channel_name),
-            NotificationManager.IMPORTANCE_DEFAULT
+            NotificationManager.IMPORTANCE_HIGH
         ).apply {
             description = context.getString(R.string.update_channel_description)
             enableVibration(true)
@@ -64,6 +65,19 @@ class DefaultAutoUpdateNotifier(private val context: Context) : AutoUpdateNotifi
             .setAutoCancel(true)
             .setSilent(false)
             .setContentIntent(intent)
+            .build()
+
+        notificationManager.notify(NOTIFICATION_ID, notification)
+    }
+
+    override fun showUpdateAvailableNotification() {
+        val notification = NotificationCompat.Builder(context, CHANNEL_ID)
+            .setSmallIcon(android.R.drawable.stat_sys_download)
+            .setContentTitle(context.getString(R.string.update_available_title))
+            .setContentText(context.getString(R.string.update_available_description))
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setAutoCancel(true)
+            .setSilent(false)
             .build()
 
         notificationManager.notify(NOTIFICATION_ID, notification)

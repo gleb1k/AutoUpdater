@@ -10,4 +10,11 @@
     <string name="check_for_update">Проверить наличие обновления</string>
     <string name="new_version_available">🚀 Доступна новая версия!</string>
     <string name="download_and_install">Скачать и установить обновление</string>
+    <string name="downloading">Загрузка…</string>
+    <string name="checking_for_update">Проверка обновлений…</string>
+
+    <string name="update_found">Доступно обновление</string>
+    <string name="update_not_found">Обновления не найдены</string>
+    <string name="update_check_error">Ошибка при проверке обновлений</string>
+    <string name="error_wifi_required">Скачивание возможно только при подключении к Wi-Fi</string>
 </resources>

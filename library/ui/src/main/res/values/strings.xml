@@ -10,4 +10,11 @@
     <string name="check_for_update">Check for update</string>
     <string name="new_version_available">🚀 New version available!</string>
     <string name="download_and_install">Download and install update</string>
+    <string name="downloading">Downloading…</string>
+    <string name="checking_for_update">Checking for updates…</string>
+
+    <string name="update_found">Update available</string>
+    <string name="update_not_found">No updates found</string>
+    <string name="update_check_error">Error while checking for updates</string>
+    <string name="error_wifi_required">Download is only allowed over Wi-Fi</string>
 </resources>

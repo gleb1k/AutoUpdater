@@ -10,8 +10,11 @@ import android.net.Uri
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
+import ru.glebik.updater.library.AutoUpdater
+import ru.glebik.updater.library.core.R
 import ru.glebik.updater.library.utils.AppUtils
 import ru.glebik.updater.library.main.installer.InstallerWorkerRunner
+import ru.glebik.updater.library.pref.AutoUpdateSharedPrefManager
 import java.io.File
 import java.util.UUID
 
@@ -21,6 +24,7 @@ interface ApkDownloader {
 
 class DefaultApkDownloader(
     private val installerWorkerRunner: InstallerWorkerRunner,
+    private val prefManager: AutoUpdateSharedPrefManager,
 ) : ApkDownloader {
 
     override fun download(context: Context, apkUrl: String) {
@@ -30,10 +34,15 @@ class DefaultApkDownloader(
         // Устанавливаем URI для скачивания
         val uri = apkUrl.toUri()
         val request = DownloadManager.Request(uri).apply {
-            setTitle("Downloading APK")
-            setDescription("Downloading the latest version of the app.")
+            setTitle(context.getString(R.string.apk_download_title))
+            setDescription(context.getString(R.string.apk_download_description))
             setDestinationInExternalFilesDir(context, null, AppUtils.getAppApkFileName(context))
             setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+            if (prefManager.isWifiOnlyEnabled) {
+                setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI)
+            } else {
+                setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI or DownloadManager.Request.NETWORK_MOBILE)
+            }
         }
 
         // Загружаем файл

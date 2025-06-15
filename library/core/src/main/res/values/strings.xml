@@ -6,4 +6,8 @@
     <string name="update_success_description">The application has been successfully updated</string>
     <string name="update_channel_name">Auto Update Notifications</string>
     <string name="update_channel_description">Notifications from the auto-update system</string>
+    <string name="update_available_title">Update available</string>
+    <string name="update_available_description">Update the app to get the latest improvements.</string>
+    <string name="apk_download_title">Downloading APK</string>
+    <string name="apk_download_description">Downloading the latest version of the app.</string>
 </resources>

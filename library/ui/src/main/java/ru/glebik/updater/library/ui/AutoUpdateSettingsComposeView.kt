@@ -1,14 +1,17 @@
 package ru.glebik.updater.library.ui
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
@@ -31,7 +34,7 @@ fun AutoUpdateDebugComposeView(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Text(stringResource(R.string.auto_update_settings_title), style = MaterialTheme.typography.headlineSmall)
@@ -64,19 +67,58 @@ fun AutoUpdateDebugComposeView(
         HorizontalDivider()
 
         if (model.availableUpdate == null) {
-            Button(
-                modifier = Modifier.fillMaxWidth(),
-                onClick = onCheckUpdateClick
-            ) {
-                Text(stringResource(R.string.check_for_update))
-            }
+            ButtonWithLoader(
+                onClick = onCheckUpdateClick,
+                isLoading = model.isLoading,
+                idleText = stringResource(R.string.check_for_update),
+                loadingText = stringResource(R.string.checking_for_update),
+            )
         } else {
             Text(stringResource(R.string.new_version_available))
-            Button(
+            ButtonWithLoader(
                 onClick = downloadAndInstallUpdate,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(stringResource(R.string.download_and_install))
+                isLoading = model.isLoading,
+                idleText = stringResource(R.string.download_and_install),
+                loadingText = stringResource(R.string.downloading),
+            )
+        }
+    }
+}
+
+@Composable
+private fun ButtonWithLoader(
+    isLoading: Boolean,
+    onClick: () -> Unit,
+    idleText: String,
+    loadingText: String
+) {
+    Button(
+        onClick = onClick,
+        modifier = Modifier.height(48.dp).fillMaxWidth(),
+        enabled = !isLoading,
+        contentPadding = PaddingValues(horizontal = 16.dp)
+    ) {
+        Box(
+            modifier = Modifier.fillMaxWidth(),
+            contentAlignment = Alignment.Center
+        ) {
+            if (isLoading) {
+                CircularProgressIndicator(
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    strokeWidth = 2.dp,
+                    modifier = Modifier
+                        .size(20.dp)
+                        .align(Alignment.CenterStart)
+                )
+                Text(
+                    text = loadingText,
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            } else {
+                Text(
+                    text = idleText,
+                    modifier = Modifier.align(Alignment.Center)
+                )
             }
         }
     }

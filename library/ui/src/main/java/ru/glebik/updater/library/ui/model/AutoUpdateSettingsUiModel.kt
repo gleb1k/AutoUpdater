@@ -7,4 +7,5 @@ data class AutoUpdateSettingsUiModel(
     val lastCheckTime: String?,
     val availableUpdate: AvailableUpdate?,
     val onlyWifi: Boolean,
+    val isLoading: Boolean,
 )

@@ -18,6 +18,8 @@ import ru.glebik.updater.library.notifications.DefaultAutoUpdateNotifier
 import ru.glebik.updater.library.pref.AutoUpdateSharedPrefManager
 import ru.glebik.updater.library.pref.DefaultAutoUpdateSharedPrefManager
 import ru.glebik.updater.library.utils.AppVersionHelper
+import ru.glebik.updater.library.utils.NetworkChecker
+import ru.glebik.updater.library.utils.DefaultNetworkChecker
 import ru.glebik.updater.library.workmanager.DefaultWorkManagerConfigurator
 import ru.glebik.updater.library.workmanager.WorkManagerConfigurator
 import java.util.UUID
@@ -48,6 +50,9 @@ object AutoUpdater {
     lateinit var prefManager: AutoUpdateSharedPrefManager
         private set
 
+    lateinit var networkChecker: NetworkChecker
+        private set
+
     /**
      * Initializes the AutoUpdater with custom implementations.
      * Must be called from Application.onCreate.
@@ -67,6 +72,7 @@ object AutoUpdater {
         this.workManagerConfigurator = autoUpdaterConfiguration.workManagerConfigurator
         this.appVersionHelper = autoUpdaterConfiguration.appVersionHelper
         this.prefManager = autoUpdaterConfiguration.prefManager
+        this.networkChecker = autoUpdaterConfiguration.networkChecker
 
         WorkManager.initialize(
             applicationContext,
@@ -93,20 +99,23 @@ object AutoUpdater {
         val defaultInstallerWorkerRunner =
             DefaultInstallerWorkerRunner(applicationContext, defaultInstallerWorkerRequestFactory)
 
-        val defaultApkDownloader =
-            DefaultApkDownloader(defaultInstallerWorkerRunner)
-
-        val appVersionHelper = AppVersionHelper(applicationContext)
-
         val defaultAutoUpdateSharedPrefManager =
             DefaultAutoUpdateSharedPrefManager(applicationContext)
 
+        val defaultApkDownloader =
+            DefaultApkDownloader(defaultInstallerWorkerRunner,defaultAutoUpdateSharedPrefManager )
+
+        val appVersionHelper = AppVersionHelper(applicationContext)
+
         val defaultWorkManagerConfigurator =
             DefaultWorkManagerConfigurator(
-                DefaultApkDownloader(defaultInstallerWorkerRunner),
+                defaultApkDownloader,
                 appVersionHelper,
                 defaultAutoUpdateSharedPrefManager,
+                defaultNotifier,
             )
+
+        val defaultNetworkChecker = DefaultNetworkChecker(applicationContext)
 
         this.applicationContext = applicationContext.applicationContext
         this.notifier = defaultNotifier
@@ -115,6 +124,7 @@ object AutoUpdater {
         this.workManagerConfigurator = defaultWorkManagerConfigurator
         this.appVersionHelper = appVersionHelper
         this.prefManager = defaultAutoUpdateSharedPrefManager
+        this.networkChecker = defaultNetworkChecker
 
         WorkManager.initialize(
             applicationContext,

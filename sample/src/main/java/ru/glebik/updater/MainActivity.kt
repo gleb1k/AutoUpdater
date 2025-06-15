@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.work.WorkManager
 import ru.glebik.updater.consts.getSampleOneTimeCheckerParameters
+import ru.glebik.updater.library.AutoUpdater
 import ru.glebik.updater.library.init.UpdateConfig
 import ru.glebik.updater.library.ui.AutoUpdateSettingsScreen
 import ru.glebik.updater.library.ui.vm.AutoUpdateDebugViewModelFactory
@@ -29,11 +30,7 @@ import ru.glebik.updater.ui.theme.AutoUpdaterTheme
 class MainActivity : ComponentActivity() {
     private val installPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                // Разрешение предоставлено
-            } else {
-                // Разрешение не предоставлено
-            }
+
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,29 +41,8 @@ class MainActivity : ComponentActivity() {
             val intent = Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES).apply {
                 data = Uri.parse("package:${applicationContext.packageName}")
             }
-            // Используем ActivityResultLauncher вместо startActivityForResult, который устарел
             installPermissionLauncher.launch(intent)
         }
-//
-//// Проверка разрешений на доступ к хранилищу (для Android 6.0 и выше)
-//        if (ContextCompat.checkSelfPermission(
-//                this,
-//                Manifest.permission.READ_EXTERNAL_STORAGE
-//            ) != PackageManager.PERMISSION_GRANTED ||
-//            ContextCompat.checkSelfPermission(
-//                this,
-//                Manifest.permission.WRITE_EXTERNAL_STORAGE
-//            ) != PackageManager.PERMISSION_GRANTED
-//        ) {
-//            ActivityCompat.requestPermissions(
-//                this,
-//                arrayOf(
-//                    Manifest.permission.READ_EXTERNAL_STORAGE,
-//                    Manifest.permission.WRITE_EXTERNAL_STORAGE
-//                ),
-//                1
-//            )
-//        }
 
         enableEdgeToEdge()
         setContent {
@@ -81,6 +57,7 @@ class MainActivity : ComponentActivity() {
                     ) {
                         val factory = remember {
                             AutoUpdateDebugViewModelFactory(
+                                AutoUpdater.networkChecker,
                                 WorkManager.getInstance(applicationContext),
                                 getSampleOneTimeCheckerParameters(),
                             )

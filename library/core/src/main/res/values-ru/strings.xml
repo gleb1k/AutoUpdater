@@ -6,5 +6,8 @@
     <string name="update_success_description">Приложение успешно обновлено</string>
     <string name="update_channel_name">Уведомления автообновлений</string>
     <string name="update_channel_description">Уведомления от системы автообновлений</string>
-
+    <string name="update_available_title">Доступно обновление</string>
+    <string name="update_available_description">Обновите приложение для получения последних улучшений.</string>
+    <string name="apk_download_title">Загрузка APK</string>
+    <string name="apk_download_description">Загружается последняя версия приложения.</string>
 </resources>

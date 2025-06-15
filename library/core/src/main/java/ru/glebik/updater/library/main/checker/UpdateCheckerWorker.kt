@@ -7,6 +7,7 @@ import androidx.work.WorkerParameters
 import ru.glebik.updater.library.consts.InternalConsts
 import ru.glebik.updater.library.http.HttpUtils
 import ru.glebik.updater.library.main.loader.ApkDownloader
+import ru.glebik.updater.library.notifications.AutoUpdateNotifier
 import ru.glebik.updater.library.parser.Parser
 import ru.glebik.updater.library.parser.ParserParameters
 import ru.glebik.updater.library.pref.AutoUpdateSharedPrefManager
@@ -18,6 +19,7 @@ class UpdateCheckerWorker(
     private val apkDownloader: ApkDownloader,
     private val appVersionHelper: AppVersionHelper,
     private val prefManager: AutoUpdateSharedPrefManager,
+    private val notifier: AutoUpdateNotifier,
 ) : CoroutineWorker(appContext, workerParams) {
 
     override suspend fun doWork(): Result {
@@ -46,7 +48,10 @@ class UpdateCheckerWorker(
             val availableUpdate = Parser.parseJson(response, parserParameters)
             Log.d(InternalConsts.LIBRARY_TAG, availableUpdate.toString())
 
-            prefManager.availableUpdate = availableUpdate
+            if (availableUpdate.version > appVersionHelper.getAppVersionCode()) {
+                prefManager.availableUpdate = availableUpdate
+                notifier.showUpdateAvailableNotification()
+            }
 
             if (needToDownload && availableUpdate.version > appVersionHelper.getAppVersionCode()) {
                 apkDownloader.download(applicationContext, availableUpdate.apkUrl)
