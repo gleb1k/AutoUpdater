@@ -3,7 +3,6 @@ package ru.glebik.updater.library.main.checker
 import androidx.work.Data
 import androidx.work.OneTimeWorkRequest
 import androidx.work.PeriodicWorkRequest
-import ru.glebik.updater.library.init.UpdateConfig
 
 interface UpdateCheckerWorkerRequestFactory {
     fun createPeriodicRequest(

@@ -20,7 +20,7 @@ class InstallerWorker(
         kotlin.runCatching {
             val apkUri = inputData.getString(URI_KEY)?.toUri()
                 ?: throw IllegalArgumentException("InstallerWorker: Input Data must have $URI_KEY parameter")
-            Installer.updateAppWithPackageInstaller(appContext, apkUri)
+            Installer.installApk(appContext, apkUri)
         }.onFailure {
             WorkManager.getInstance(appContext).cancelWorkById(id)
             return Result.failure()

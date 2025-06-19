@@ -21,7 +21,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.work.WorkManager
 import ru.glebik.updater.consts.getSampleOneTimeCheckerParameters
 import ru.glebik.updater.library.AutoUpdater
-import ru.glebik.updater.library.init.UpdateConfig
 import ru.glebik.updater.library.ui.AutoUpdateSettingsScreen
 import ru.glebik.updater.library.ui.vm.AutoUpdateDebugViewModelFactory
 import ru.glebik.updater.ui.theme.AutoUpdaterTheme

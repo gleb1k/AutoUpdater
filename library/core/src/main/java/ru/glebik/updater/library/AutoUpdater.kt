@@ -3,7 +3,6 @@ package ru.glebik.updater.library
 import android.annotation.SuppressLint
 import android.content.Context
 import androidx.work.WorkManager
-import ru.glebik.updater.library.init.UpdateConfig
 import ru.glebik.updater.library.main.checker.CheckerParameters
 import ru.glebik.updater.library.main.checker.DefaultUpdateCheckerRunner
 import ru.glebik.updater.library.main.checker.DefaultUpdateCheckerWorkerRequestFactory
@@ -18,8 +17,8 @@ import ru.glebik.updater.library.notifications.DefaultAutoUpdateNotifier
 import ru.glebik.updater.library.pref.AutoUpdateSharedPrefManager
 import ru.glebik.updater.library.pref.DefaultAutoUpdateSharedPrefManager
 import ru.glebik.updater.library.utils.AppVersionHelper
-import ru.glebik.updater.library.utils.NetworkChecker
 import ru.glebik.updater.library.utils.DefaultNetworkChecker
+import ru.glebik.updater.library.utils.NetworkChecker
 import ru.glebik.updater.library.workmanager.DefaultWorkManagerConfigurator
 import ru.glebik.updater.library.workmanager.WorkManagerConfigurator
 import java.util.UUID
@@ -27,19 +26,15 @@ import java.util.UUID
 
 object AutoUpdater {
 
-    lateinit var applicationContext: Context
-        private set
+    private lateinit var applicationContext: Context
+
+    private lateinit var updateCheckerWorkerRunner: UpdateCheckerWorkerRunner
+
+    private lateinit var apkDownloader: ApkDownloader
+
+    private lateinit var workManagerConfigurator: WorkManagerConfigurator
 
     lateinit var notifier: AutoUpdateNotifier
-        private set
-
-    lateinit var updateCheckerWorkerRunner: UpdateCheckerWorkerRunner
-        private set
-
-    lateinit var apkDownloader: ApkDownloader
-        private set
-
-    lateinit var workManagerConfigurator: WorkManagerConfigurator
         private set
 
     @SuppressLint("StaticFieldLeak")
@@ -58,25 +53,25 @@ object AutoUpdater {
      * Must be called from Application.onCreate.
      *
      * @param applicationContext The application context.
-     * @param autoUpdaterConfiguration Configuration containing user-defined implementations of core components.
+     * @param configuration Configuration containing user-defined implementations of core components.
      */
     fun init(
         applicationContext: Context,
-        autoUpdaterConfiguration: AutoUpdaterConfiguration,
+        configuration: AutoUpdaterConfiguration,
     ) {
 
         this.applicationContext = applicationContext.applicationContext
-        this.notifier = autoUpdaterConfiguration.notifier
-        this.updateCheckerWorkerRunner = autoUpdaterConfiguration.updateCheckerWorkerRunner
-        this.apkDownloader = autoUpdaterConfiguration.apkDownloader
-        this.workManagerConfigurator = autoUpdaterConfiguration.workManagerConfigurator
-        this.appVersionHelper = autoUpdaterConfiguration.appVersionHelper
-        this.prefManager = autoUpdaterConfiguration.prefManager
-        this.networkChecker = autoUpdaterConfiguration.networkChecker
+        this.notifier = configuration.notifier
+        this.updateCheckerWorkerRunner = configuration.updateCheckerWorkerRunner
+        this.apkDownloader = configuration.apkDownloader
+        this.workManagerConfigurator = configuration.workManagerConfigurator
+        this.appVersionHelper = configuration.appVersionHelper
+        this.prefManager = configuration.prefManager
+        this.networkChecker = configuration.networkChecker
 
         WorkManager.initialize(
             applicationContext,
-            autoUpdaterConfiguration.workManagerConfigurator.createConfiguration()
+            configuration.workManagerConfigurator.createConfiguration()
         )
     }
 
@@ -95,7 +90,7 @@ object AutoUpdater {
         val defaultUpdateCheckerWorkerRunner =
             DefaultUpdateCheckerRunner(applicationContext, defaultUpdateCheckerWorkerRequestFactory)
 
-        val defaultInstallerWorkerRequestFactory = DefaultInstallerWorkerRequestFactory()
+        val defaultInstallerWorkerRequestFactory = DefaultIntallerWorkerRequestFactory()
         val defaultInstallerWorkerRunner =
             DefaultInstallerWorkerRunner(applicationContext, defaultInstallerWorkerRequestFactory)
 
@@ -103,7 +98,7 @@ object AutoUpdater {
             DefaultAutoUpdateSharedPrefManager(applicationContext)
 
         val defaultApkDownloader =
-            DefaultApkDownloader(defaultInstallerWorkerRunner,defaultAutoUpdateSharedPrefManager )
+            DefaultApkDownloader(defaultInstallerWorkerRunner, defaultAutoUpdateSharedPrefManager)
 
         val appVersionHelper = AppVersionHelper(applicationContext)
 
@@ -132,16 +127,31 @@ object AutoUpdater {
         )
     }
 
-    fun checkUpdate(updateConfig: UpdateConfig): UUID {
+    fun checkUpdate(parameters: CheckerParameters): UUID {
         val inputData = CheckerParamsMapper.map(
-            updateConfig.checkerParameters,
-            updateConfig.needToDownloadAfterCheck
+            parameters,
+            false
         )
 
-        return when (updateConfig.checkerParameters) {
+        return when (parameters) {
             is CheckerParameters.OneTime -> updateCheckerWorkerRunner.runOneTime(inputData)
             is CheckerParameters.Periodic -> updateCheckerWorkerRunner.runPeriodic(
-                updateConfig.checkerParameters,
+                parameters,
+                inputData
+            )
+        }
+    }
+
+    fun checkAndInstallUpdate(checkerParameters: CheckerParameters): UUID {
+        val inputData = CheckerParamsMapper.map(
+            checkerParameters,
+            true
+        )
+
+        return when (checkerParameters) {
+            is CheckerParameters.OneTime -> updateCheckerWorkerRunner.runOneTime(inputData)
+            is CheckerParameters.Periodic -> updateCheckerWorkerRunner.runPeriodic(
+                checkerParameters,
                 inputData
             )
         }

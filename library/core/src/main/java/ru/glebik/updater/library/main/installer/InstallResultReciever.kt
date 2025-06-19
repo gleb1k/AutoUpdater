@@ -27,7 +27,7 @@ class InstallResultReceiver : BroadcastReceiver() {
             PackageInstaller.STATUS_SUCCESS -> {
                 Log.d("Installer", "Установка прошла успешно")
                 notifier.showSuccessNotification()
-                removeUpdateFileAfterInstall(context, intent)
+                deleteFileAfterInstall(context, intent)
             }
 
             PackageInstaller.STATUS_PENDING_USER_ACTION -> {
@@ -45,7 +45,7 @@ class InstallResultReceiver : BroadcastReceiver() {
         }
     }
 
-    private fun removeUpdateFileAfterInstall(context: Context, intent: Intent) {
+    private fun deleteFileAfterInstall(context: Context, intent: Intent) {
         getApkFileUri(intent)?.let { fileUri ->
             runCatching {
                 context.contentResolver.delete(

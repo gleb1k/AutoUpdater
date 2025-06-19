@@ -14,7 +14,6 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ru.glebik.updater.library.AutoUpdater
-import ru.glebik.updater.library.init.UpdateConfig
 import ru.glebik.updater.library.main.checker.CheckerParameters
 import ru.glebik.updater.library.ui.R
 import ru.glebik.updater.library.ui.model.AutoUpdateSettingsUiModel
@@ -73,7 +72,7 @@ class AutoUpdateDebugViewModel(
         viewModelScope.launch {
             mutableState.update { state -> state.copy(model = state.model.copy(isLoading = true)) }
 
-            val requestId = AutoUpdater.checkUpdate(UpdateConfig(checkerParameters, false))
+            val requestId = AutoUpdater.checkUpdate(checkerParameters)
             workManager.getWorkInfoByIdFlow(requestId)
                 .filter { it.state.isFinished }
                 .collect { info ->
@@ -108,7 +107,9 @@ class AutoUpdateDebugViewModel(
 
     private fun downloadAndInstallUpdateIfAllowed() {
         viewModelScope.launch {
-            if (AutoUpdater.prefManager.isWifiOnlyEnabled && networkChecker.isWifiConnected().not()) {
+            if (AutoUpdater.prefManager.isWifiOnlyEnabled && networkChecker.isWifiConnected()
+                    .not()
+            ) {
                 mutableEffect.emit(AutoUpdateSettingsEffect.ShowToast(R.string.error_wifi_required))
                 return@launch
             }

@@ -1,6 +1,5 @@
 package ru.glebik.updater.library.main.checker
 
-import ru.glebik.updater.library.consts.DefaultConsts
 import java.util.concurrent.TimeUnit
 
 //параметры которые указывают по каким ключам считывать нужные значения из json
