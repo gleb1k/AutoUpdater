@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -37,7 +38,10 @@ fun AutoUpdateDebugComposeView(
             .padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Text(stringResource(R.string.auto_update_settings_title), style = MaterialTheme.typography.headlineSmall)
+        Text(
+            stringResource(R.string.auto_update_settings_title),
+            style = MaterialTheme.typography.headlineSmall
+        )
 
         Text(stringResource(R.string.section_network), style = MaterialTheme.typography.titleMedium)
         HorizontalDivider()
@@ -75,6 +79,9 @@ fun AutoUpdateDebugComposeView(
             )
         } else {
             Text(stringResource(R.string.new_version_available))
+            model.availableUpdate.message?.let {message ->
+                Text("Изменения: $message")
+            }
             ButtonWithLoader(
                 onClick = downloadAndInstallUpdate,
                 isLoading = model.isLoading,
@@ -94,7 +101,9 @@ private fun ButtonWithLoader(
 ) {
     Button(
         onClick = onClick,
-        modifier = Modifier.height(48.dp).fillMaxWidth(),
+        modifier = Modifier
+            .height(48.dp)
+            .fillMaxWidth(),
         enabled = !isLoading,
         contentPadding = PaddingValues(horizontal = 16.dp)
     ) {

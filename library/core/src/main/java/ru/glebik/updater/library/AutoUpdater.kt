@@ -90,7 +90,7 @@ object AutoUpdater {
         val defaultUpdateCheckerWorkerRunner =
             DefaultUpdateCheckerRunner(applicationContext, defaultUpdateCheckerWorkerRequestFactory)
 
-        val defaultInstallerWorkerRequestFactory = DefaultIntallerWorkerRequestFactory()
+        val defaultInstallerWorkerRequestFactory = DefaultInstallerWorkerRequestFactory()
         val defaultInstallerWorkerRunner =
             DefaultInstallerWorkerRunner(applicationContext, defaultInstallerWorkerRequestFactory)
 
